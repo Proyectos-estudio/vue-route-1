@@ -1,22 +1,17 @@
 <script setup>
 // import axios from 'axios';
 // import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import router from '../router';
+import { useRoute, useRouter } from "vue-router";
+import router from "../router";
 
-import { useGetData } from '@/composables/getData';
+import { useGetData } from "@/composables/getData";
 
-const {data, getData, loading, error} = useGetData();
+import { useFavoritosStore } from "@/store/favoritos.js";
+const useFavorito = useFavoritosStore();
 
-//empuja a una ruta en especifico
-const back = () =>{
-    router.push('/pokemons')
-}
-//obtiene los parametros
-const route = useRoute();
+const { data, getData, loading, error } = useGetData();
 
 // const poke = ref({});
-
 
 // const getPoke = async () => {
 //     try {
@@ -28,17 +23,28 @@ const route = useRoute();
 //     }
 // }
 
-getData(`https://pokeapi.co/api/v2/pokemon/${route.params.name}`);
+//empuja a una ruta en especifico
+const back = () => {
+  router.push("/pokemons");
+};
+//obtiene los parametros
+const route = useRoute();
 
+const { addFav, findPoke } = useFavorito;
+
+getData(`https://pokeapi.co/api/v2/pokemon/${route.params.name}`);
 </script>
 
 <template>
-    <h1>Pokemon</h1>
-    <p v-if="loading">Cargando pokemon...</p>
+  <h1>Pokemon</h1>
+  <p v-if="loading">Cargando pokemon...</p>
   <div class="alert alert-danger my-2" v-if="error">{{ error }}</div>
-    <div v-if="data" class="container">
-        <img :src="data?.sprites?.front_default" alt="">
-        <h1>pokemon : {{ $route.params.name }}</h1>
-    </div>
-    <button @click="back">Volver</button>
+  <div v-if="data" class="container">
+    <img :src="data?.sprites?.front_default" alt="" />
+    <h1>pokemon : {{ $route.params.name }}</h1>
+    <button :disabled="findPoke(data.name)" class="btn btn-primary mb-2" @click="addFav(data)">
+      Agregar Favoritos
+    </button>
+  </div>
+  <button @click="back">Volver</button>
 </template>
